@@ -1,0 +1,54 @@
+
+jwt:
+  signing-key: unicrm
+  expires-time: 7d
+  buffer-time: 1d
+  issuer: unicrm
+
+logger:
+  level: debug
+  director: log
+  format: console
+  stacktrace-key: stacktrace
+  prefix: "[unicrm]"
+  log-in-console: true
+  max-age: 28
+  show-line: true
+
+system:
+  use-redis: true
+  addr: 8000
+  db-type: mysql
+  router-prefix: ""
+
+mysql:
+  host: 106.12.59.2
+  port: 5535
+  user: gotest
+  password: gotest
+  db-name: gotest
+  config: charset=utf8mb4&parseTime=True&loc=Local
+  prefix: "unicrm_"
+  singular: true
+  max-idle-conns: 10
+  max-open-conns: 100
+  engine: InnoDB
+  log-mode: warn  # silent（无日志），error（仅错误日志），warn（警告及以上），info（信息及以上）
+
+redis-list:
+  - name: default  # 数据库的名称,注意: name 需要在 redis-list 中唯一
+    addr: 106.12.59.2:6379  # 单机模式
+    password: "123456"
+    db: 0
+    useCluster: false  # 集群模式，使用集群模式时，单机模式配置无效
+    clusterAddrs:
+      - "106.12.59.2:6379"
+      - "106.12.59.2:6379"
+  - name: cache           
+    addr: 106.12.59.2:6379  # 单机模式
+    password: "123456"
+    db: 0
+    useCluster: false     # 集群模式，使用集群模式时，单机模式配置无效
+    clusterAddrs:
+      - "106.12.59.2:6379"
+      - "106.12.59.2:6379"
