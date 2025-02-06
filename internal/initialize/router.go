@@ -31,7 +31,7 @@ func Routers() *gin.Engine {
 	{
 		// 健康检查接口
 		AllowAnyGroup.GET("/health", func(c *gin.Context) {
-			c.JSON(http.StatusOK, "ok")
+			c.String(http.StatusOK, "ok")
 		})
 	}
 

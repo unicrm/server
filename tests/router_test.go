@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -27,6 +26,5 @@ func TestRouters(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/health", nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
-	fmt.Println(w.Body)
 	assert.Equal(t, "ok", w.Body.String())
 }
