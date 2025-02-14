@@ -17,17 +17,18 @@ func main() {
 	// 初始化日志
 	globals.UNICRM_LOGGER = logging.LoggerInit(globals.UNICRM_CONFIG.Logger)
 	zap.ReplaceGlobals(globals.UNICRM_LOGGER) // 替换全局的日志对象
-	// 初始化其他配置文件
+	// 初始化认证服务
 	initialize.OtherInit()
 	// 注册定时任务
 	initialize.RegisterTimer()
 	// 初始化数据库
-	globals.UNICRM_DB = database.DatabaseInit(globals.GetGeneralDB())
+	globals.UNICRM_DB = database.DatabaseInit(globals.UNICRM_CONFIG.GeneralDB)
 	defer database.DatabaseClose(globals.UNICRM_DB)
 	// 注册数据库表结构
 	database.RegisterTables(globals.UNICRM_DB, globals.RegisterTables...)
 	// 初始化Redis
 	globals.UNICRM_REDIS_LIST = redis.InitRedisList(globals.UNICRM_CONFIG.RedisList)
+	globals.UNICRM_REDIS = globals.GetRedis(globals.UNICRM_CONFIG.System.RedisName)
 	// 启动服务
 	core.RunServer()
 }

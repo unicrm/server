@@ -2,11 +2,15 @@
 # local env files
 .DS_Store
 
-# Editor directories and files
+# editor directories and files
 .idea
 .vscode
 
 # server
 /log/
 /pkg/logging/log/
+/tmp/
 
+# cmd
+/cmd/server/
+!/cmd/server/main.go

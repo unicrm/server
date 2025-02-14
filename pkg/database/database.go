@@ -2,12 +2,12 @@ package database
 
 import (
 	"github.com/unicrm/server/pkg/database/internal"
-	"github.com/unicrm/server/pkg/database/model"
+	"github.com/unicrm/server/pkg/database/models"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
-func DatabaseInit(general model.GeneralDB) *gorm.DB {
+func DatabaseInit(general models.GeneralDB) *gorm.DB {
 	switch general.DBType {
 	case "mysql":
 		return internal.MysqlInitByConfig(general)

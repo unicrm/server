@@ -1,4 +1,79 @@
+definitions:
+  github_com_unicrm_server_internal_models_common_response.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      msg:
+        type: string
+    type: object
+  github_com_unicrm_server_internal_models_system_request.Login:
+    properties:
+      captcha:
+        description: 验证码
+        type: string
+      captchaId:
+        description: 验证码ID
+        type: string
+      password:
+        description: 密码
+        type: string
+      username:
+        description: 用户名
+        type: string
+    type: object
+  github_com_unicrm_server_internal_models_system_response.SysCaptchaResponse:
+    properties:
+      captchaId:
+        type: string
+      captchaLength:
+        type: integer
+      openCaptcha:
+        type: boolean
+      picPath:
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /base/captcha:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_unicrm_server_internal_models_common_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_unicrm_server_internal_models_system_response.SysCaptchaResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取验证码
+      tags:
+      - 系统管理
+  /base/login:
+    post:
+      parameters:
+      - description: 用户信息
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_unicrm_server_internal_models_system_request.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_unicrm_server_internal_models_common_response.Response'
+      summary: 登录接口
+      tags:
+      - 系统管理
 swagger: "2.0"

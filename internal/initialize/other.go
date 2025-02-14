@@ -1,21 +1,18 @@
 package initialize
 
 import (
-	// 初始化系统数据
-	"fmt"
-	"time"
-
-	"github.com/patrickmn/go-cache"
 	"github.com/unicrm/server/internal/globals"
-	_ "github.com/unicrm/server/internal/source/system"
+	"github.com/unicrm/server/pkg/auth/tools"
+	"go.uber.org/zap"
 )
 
 func OtherInit() {
-	jwt := globals.UNICRM_CONFIG.JWT
-	fmt.Printf("加载其他配置项, JWT: %+v \n", jwt)
-
-	dr, _ := time.ParseDuration(jwt.BufferTime)
-	globals.UNICRM_BLACK_CACHE = cache.New(dr, 10*time.Minute)
+	if _, err := tools.ParseDuration(globals.UNICRM_CONFIG.JWT.ExpiresTime); err != nil {
+		zap.L().Panic("解析JWT过期时间失败", zap.Error(err))
+	}
+	if _, err := tools.ParseDuration(globals.UNICRM_CONFIG.JWT.BufferTime); err != nil {
+		zap.L().Panic("解析JWT缓冲时间失败", zap.Error(err))
+	}
 }
 
 func init() {}

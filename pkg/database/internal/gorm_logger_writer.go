@@ -3,16 +3,16 @@ package internal
 import (
 	"fmt"
 
-	"github.com/unicrm/server/pkg/database/model"
+	"github.com/unicrm/server/pkg/database/models"
 	"go.uber.org/zap"
 	"gorm.io/gorm/logger"
 )
 
 type Writer struct {
-	config model.GeneralDB
+	config models.GeneralDB
 }
 
-func NewWriter(config model.GeneralDB) *Writer {
+func NewWriter(config models.GeneralDB) *Writer {
 	return &Writer{config: config}
 }
 

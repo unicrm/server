@@ -6,15 +6,19 @@ import (
 
 	"github.com/unicrm/server/internal/globals"
 	"github.com/unicrm/server/internal/initialize"
-	"github.com/unicrm/server/internal/services/system"
 
 	"go.uber.org/zap"
 )
 
 func RunServer() {
 
+	// 初始化鉴权配置
+	globals.UNICRM_AUTH = initialize.AuthInit()
 	// 从数据库加载jwt黑名单
-	system.LoadJwtBlackList()
+	initialize.LoadJwtBlackList()
+
+	// 初始化验证码配置
+	globals.UNICRM_CAPTCHA = initialize.CaptchaInit()
 
 	// 初始化路由
 	Router := initialize.Routers()
@@ -24,7 +28,7 @@ func RunServer() {
 
 	fmt.Printf("\n")
 	fmt.Printf("使用说明 \n")
-	fmt.Printf("初始化文档: swag init -g cmd/server/main.go \n")
+	fmt.Printf("初始化文档: swag init -g cmd/server/main.go --parseDependency \n")
 	fmt.Printf("文档访问地址: \033[32m%s/swagger/index.html \033[0m\n", address)
 	fmt.Printf("\n")
 

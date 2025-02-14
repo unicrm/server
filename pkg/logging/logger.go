@@ -30,7 +30,7 @@ func LoggerInit(config Logger) *zap.Logger {
 	logger := zap.New(zapcore.NewTee(cores...))
 
 	// 添加堆栈信息，只在error级别时添加堆栈信息
-	logger = logger.WithOptions(zap.AddStacktrace(zapcore.ErrorLevel))
+	// logger = logger.WithOptions(zap.AddStacktrace(zapcore.ErrorLevel))
 
 	// 添加调用者信息
 	if LoggerConfig.ShowLine {

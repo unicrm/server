@@ -4,38 +4,42 @@ import (
 	"context"
 	"testing"
 
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
-	"github.com/unicrm/server/pkg/redis/internal"
+	"go.uber.org/zap"
 )
 
-func TestRedisList(t *testing.T) {
-	redisConfigList := []Redis{
-		{
-			Name:         "default",
-			Addr:         "106.12.59.2:6379",
-			Password:     "123456",
-			DB:           0,
-			UseCluster:   false,
-			ClusterAddrs: []string{},
-		},
-		{
-			Name:         "cache",
-			Addr:         "106.12.59.2:6379",
-			Password:     "123456",
-			DB:           0,
-			UseCluster:   false,
-			ClusterAddrs: []string{},
-		},
-	}
+var ReadisList []Redis
 
-	redisList := InitRedisList(redisConfigList)
+func TestMain(m *testing.M) {
+	// 初始化日志
+	logger, _ := zap.NewDevelopment()
+	defer logger.Sync()
+	zap.ReplaceGlobals(logger)
+	// 初始化配置文件
+	v := viper.New()
+	v.SetConfigFile("../../config.debug.yaml")
+	v.SetConfigType("yaml")
+	if err := v.ReadInConfig(); err != nil {
+		logger.Error("读取配置文件失败", zap.Error(err))
+	}
+	v.WatchConfig()
+	if err := v.UnmarshalKey("redis-list", &ReadisList); err != nil {
+		logger.Error("解析配置文件失败", zap.Error(err))
+	}
+	m.Run()
+}
+
+func TestRedisList(t *testing.T) {
+
+	redisList := InitRedisList(ReadisList)
 
 	defer redisList["default"].Close()
 	redisList["default"].Set(context.Background(), "test", "test", 0)
 	test1 := redisList["default"].Get(context.Background(), "test")
 	assert.Equal(t, "test", test1.Val())
 
-	redis := redisList[internal.DEFAULT_REDIS_NAME]
+	redis := redisList[DEFAULT_REDIS_NAME]
 	defer redis.Close()
 	redis.Set(context.Background(), "test", "test", 0)
 	test2 := redis.Get(context.Background(), "test")

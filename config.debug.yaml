@@ -1,4 +1,12 @@
 
+
+captcha:
+  image-width: 240
+  image-height: 80
+  key-long: 4
+  open-captcha: 0  # 0代表一直开启，大于0代表限制次数
+  open-captcha-timeout: 3600  # open-captcha大于0时才生效
+
 jwt:
   signing-key: unicrm
   expires-time: 7d
@@ -16,17 +24,19 @@ logger:
   show-line: true
 
 system:
-  use-redis: true
+  run-mode: debug
   addr: 8000
-  db-type: mysql
-  router-prefix: ""
+  use-redis: true
+  router-prefix: "/api/v1"
+  redis-name: default
 
-mysql:
+general-db:
+  db-type: mysql
   host: 106.12.59.2
   port: 5535
-  user: gotest
-  password: gotest
-  db-name: gotest
+  user: unicrm
+  password: 123456
+  db-name: unicrm
   config: charset=utf8mb4&parseTime=True&loc=Local
   prefix: "unicrm_"
   singular: true
