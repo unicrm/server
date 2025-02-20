@@ -3,7 +3,6 @@ package initialize
 import (
 	"github.com/unicrm/server/internal/globals"
 	"github.com/unicrm/server/internal/models/system"
-	_ "github.com/unicrm/server/internal/source/system"
 	"github.com/unicrm/server/pkg/auth"
 	"go.uber.org/zap"
 )
@@ -12,7 +11,7 @@ func AuthInit() *auth.AuthExtend {
 	// 初始化JWT认证服务
 	authExtend := auth.InitAuth(globals.UNICRM_CONFIG.JWT)
 	// 初始化，并设置缓存过期时间
-	auth.InitBlacklist(globals.UNICRM_CONFIG.JWT)
+	globals.UNICRM_BLACK_CACHE, _ = auth.InitBlacklist(globals.UNICRM_CONFIG.JWT)
 	return authExtend
 }
 

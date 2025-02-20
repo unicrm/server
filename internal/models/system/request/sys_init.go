@@ -1,6 +1,8 @@
 package request
 
 import (
+	"fmt"
+
 	"github.com/unicrm/server/pkg/database/models"
 )
 
@@ -11,8 +13,20 @@ type InitDB struct {
 	DBType        string `json:"db-type"`                    // 数据库类型
 }
 
-func (i InitDB) ToMysqlConfig() models.Mysql {
+// MysqlEmptyDsn 空数据库
+func (initDB InitDB) MysqlEmptyDsn() string {
+	if initDB.Host == "" {
+		initDB.Host = "127.0.0.1"
+	}
+	if initDB.Port == "" {
+		initDB.Port = "3306"
+	}
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/", initDB.User, initDB.Password, initDB.Host, initDB.Port)
+}
+
+// ToMysqlConfig 转成mysql配置
+func (initDB InitDB) ToMysqlConfig() models.Mysql {
 	return models.Mysql{
-		GeneralDB: models.GeneralDB(i.GeneralDB),
+		GeneralDB: models.GeneralDB(initDB.GeneralDB),
 	}
 }

@@ -49,7 +49,8 @@ func Routers() *gin.Engine {
 	}
 
 	{
-		system.BaseRouterApp.InitBaseRouter(AllowAnyGroup)
+		system.BaseRouterApp.InitBaseRouter(AllowAnyGroup) // 系统管理
+		system.InitRouterApp.InitInitRouter(AllowAnyGroup) // 数据库
 	}
 	zap.L().Info("注册路由成功")
 	return Router

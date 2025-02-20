@@ -7,12 +7,75 @@ definitions:
       msg:
         type: string
     type: object
+  github_com_unicrm_server_internal_models_system.SysUser:
+    properties:
+      ID:
+        description: 主键ID
+        type: integer
+      createdAt:
+        description: 创建时间
+        type: string
+      email:
+        type: string
+      enable:
+        type: integer
+      phone:
+        type: string
+      updatedAt:
+        description: 更新时间
+        type: string
+      username:
+        type: string
+      uuid:
+        type: string
+    type: object
+  github_com_unicrm_server_internal_models_system_request.InitDB:
+    properties:
+      admin-password:
+        type: string
+      config:
+        type: string
+      db-name:
+        description: 数据库名
+        type: string
+      db-type:
+        description: 数据库类型
+        type: string
+      engine:
+        default: InnoDB
+        description: 数据库引擎，默认InnoDB
+        type: string
+      host:
+        type: string
+      log-mode:
+        description: 是否开启Gorm全局日志
+        type: string
+      max-idle-conns:
+        description: 空闲中的最大连接数
+        type: integer
+      max-open-conns:
+        description: 打开到数据库的最大连接数
+        type: integer
+      password:
+        type: string
+      port:
+        type: string
+      prefix:
+        type: string
+      singular:
+        type: boolean
+      user:
+        type: string
+    required:
+    - admin-password
+    - db-name
+    type: object
   github_com_unicrm_server_internal_models_system_request.Login:
     properties:
       captcha:
         description: 验证码
         type: string
-      captchaId:
+      captcha_id:
         description: 验证码ID
         type: string
       password:
@@ -21,6 +84,36 @@ definitions:
       username:
         description: 用户名
         type: string
+    required:
+    - captcha
+    - password
+    - username
+    type: object
+  github_com_unicrm_server_internal_models_system_request.Register:
+    properties:
+      email:
+        description: 邮箱
+        example: 邮箱
+        type: string
+      enable:
+        description: 是否启用
+        example: 是否启用
+        type: string
+      password:
+        description: 密码
+        example: 密码
+        type: string
+      phone:
+        description: 手机号
+        example: 手机号
+        type: string
+      username:
+        description: 用户名
+        example: 用户名
+        type: string
+    required:
+    - password
+    - username
     type: object
   github_com_unicrm_server_internal_models_system_response.SysCaptchaResponse:
     properties:
@@ -33,13 +126,16 @@ definitions:
       picPath:
         type: string
     type: object
+  github_com_unicrm_server_internal_models_system_response.SysUserResponse:
+    properties:
+      user:
+        $ref: '#/definitions/github_com_unicrm_server_internal_models_system.SysUser'
+    type: object
 info:
   contact: {}
 paths:
   /base/captcha:
     post:
-      consumes:
-      - application/json
       produces:
       - application/json
       responses:
@@ -52,8 +148,6 @@ paths:
                 data:
                   $ref: '#/definitions/github_com_unicrm_server_internal_models_system_response.SysCaptchaResponse'
               type: object
-      security:
-      - ApiKeyAuth: []
       summary: 获取验证码
       tags:
       - 系统管理
@@ -76,4 +170,77 @@ paths:
       summary: 登录接口
       tags:
       - 系统管理
+  /base/register:
+    post:
+      parameters:
+      - description: 用户信息
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_unicrm_server_internal_models_system_request.Register'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_unicrm_server_internal_models_common_response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/github_com_unicrm_server_internal_models_system_response.SysUserResponse'
+                  - properties:
+                      user:
+                        $ref: '#/definitions/github_com_unicrm_server_internal_models_system.SysUser'
+                    type: object
+              type: object
+      summary: 注册接口
+      tags:
+      - 系统管理
+  /init/checkdb:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 检查数据库是否初始化成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_unicrm_server_internal_models_common_response.Response'
+            - properties:
+                ' msg':
+                  type: string
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 检查数据库
+      tags:
+      - 数据库
+  /init/initdb:
+    post:
+      parameters:
+      - description: 初始化数据库参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_unicrm_server_internal_models_system_request.InitDB'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 初始化用户数据库
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_unicrm_server_internal_models_common_response.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 初始化数据库
+      tags:
+      - 数据库
 swagger: "2.0"

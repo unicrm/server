@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -9,7 +10,10 @@ import (
 	"go.uber.org/zap"
 )
 
-var ReadisList []Redis
+var (
+	redisListConfig []Redis
+	redisList       RedisList
+)
 
 func TestMain(m *testing.M) {
 	// 初始化日志
@@ -24,7 +28,7 @@ func TestMain(m *testing.M) {
 		logger.Error("读取配置文件失败", zap.Error(err))
 	}
 	v.WatchConfig()
-	if err := v.UnmarshalKey("redis-list", &ReadisList); err != nil {
+	if err := v.UnmarshalKey("redis-list", &redisListConfig); err != nil {
 		logger.Error("解析配置文件失败", zap.Error(err))
 	}
 	m.Run()
@@ -32,21 +36,27 @@ func TestMain(m *testing.M) {
 
 func TestRedisList(t *testing.T) {
 
-	redisList := InitRedisList(ReadisList)
+	redisList = InitRedisList(redisListConfig)
+	fmt.Println(redisList)
 
+	redisList[DEFAULT_REDIS_NAME].Set(context.Background(), "test", "test", 0)
+	test := redisList[DEFAULT_REDIS_NAME].Get(context.Background(), "test")
+	assert.Equal(t, "test", test.Val())
+
+	redisList["cache"].Set(context.Background(), "cache", "cache", 0)
+	cache := redisList["cache"].Get(context.Background(), "cache")
+	assert.Equal(t, "cache", cache.Val())
+}
+
+func TestRedisNil(t *testing.T) {
+	ss, err := redisList[DEFAULT_REDIS_NAME].Get(context.Background(), "ss").Result()
+	fmt.Println(ss, err)
+
+	aa := redisList[DEFAULT_REDIS_NAME].Get(context.Background(), "aa").Val()
+	fmt.Println(aa)
+}
+
+func TestRedisClose(t *testing.T) {
 	defer redisList["default"].Close()
-	redisList["default"].Set(context.Background(), "test", "test", 0)
-	test1 := redisList["default"].Get(context.Background(), "test")
-	assert.Equal(t, "test", test1.Val())
-
-	redis := redisList[DEFAULT_REDIS_NAME]
-	defer redis.Close()
-	redis.Set(context.Background(), "test", "test", 0)
-	test2 := redis.Get(context.Background(), "test")
-	assert.Equal(t, "test", test2.Val())
-
 	defer redisList["cache"].Close()
-	redisList["cache"].Set(context.Background(), "test", "test", 0)
-	test3 := redisList["cache"].Get(context.Background(), "test")
-	assert.Equal(t, "test", test3.Val())
 }

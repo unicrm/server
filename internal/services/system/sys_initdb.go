@@ -2,12 +2,14 @@ package system
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"sort"
 
 	"github.com/unicrm/server/internal/globals"
 	"github.com/unicrm/server/internal/models/system/request"
+	"go.uber.org/zap"
 )
 
 // SubInitializer 提供 source/*/init() 使用的接口，每个 initializer 完成一个初始化过程
@@ -51,6 +53,8 @@ func RegisterInit(order int, init SubInitializer) {
 
 /* ---- * service * ---- */
 
+var InitDBServiceApp = new(InitDBService)
+
 type InitDBService struct{}
 
 func (i *InitDBService) InitDB(conf request.InitDB) (err error) {
@@ -80,6 +84,25 @@ func (i *InitDBService) InitDB(conf request.InitDB) (err error) {
 	initializers = initSlice{}               // 清空 initializers
 	cache = map[string]*orderedInitializer{} // 清空 cache
 	return nil
+}
+
+// createDatabase 创建数据库
+func createDatabase(dsn string, driver string, createSql string) error {
+	db, err := sql.Open(driver, dsn)
+	if err != nil {
+		return err
+	}
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			zap.L().Error("初始化数据库，关闭数据库失败", zap.Error(err))
+		}
+	}(db)
+	if err = db.Ping(); err != nil {
+		return err
+	}
+	_, err = db.Exec(createSql)
+	return err
 }
 
 /* -- sortable interface -- */

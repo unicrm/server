@@ -9,9 +9,10 @@ var BaseRouterApp = new(BaseRouter)
 
 type BaseRouter struct{}
 
-func (br *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) (R gin.IRouter) {
+func (BaseRouter) InitBaseRouter(Router *gin.RouterGroup) (R gin.IRouter) {
 	baseRouter := Router.Group("base")
 	{
+		baseRouter.POST("register", system.BaseApiApp.Register)
 		baseRouter.POST("login", system.BaseApiApp.Login)
 		baseRouter.POST("captcha", system.BaseApiApp.Captcha)
 	}

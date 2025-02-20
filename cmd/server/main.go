@@ -25,7 +25,7 @@ func main() {
 	globals.UNICRM_DB = database.DatabaseInit(globals.UNICRM_CONFIG.GeneralDB)
 	defer database.DatabaseClose(globals.UNICRM_DB)
 	// 注册数据库表结构
-	database.RegisterTables(globals.UNICRM_DB, globals.RegisterTables...)
+	database.RegisterTables(globals.UNICRM_DB, globals.UNICRM_TABLES...)
 	// 初始化Redis
 	globals.UNICRM_REDIS_LIST = redis.InitRedisList(globals.UNICRM_CONFIG.RedisList)
 	globals.UNICRM_REDIS = globals.GetRedis(globals.UNICRM_CONFIG.System.RedisName)

@@ -17,14 +17,6 @@ const docTemplate = `{
     "paths": {
         "/base/captcha": {
             "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -83,6 +75,137 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/base/register": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "系统管理"
+                ],
+                "summary": "注册接口",
+                "parameters": [
+                    {
+                        "description": "用户信息",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_unicrm_server_internal_models_system_request.Register"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_unicrm_server_internal_models_common_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/github_com_unicrm_server_internal_models_system_response.SysUserResponse"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "user": {
+                                                            "$ref": "#/definitions/github_com_unicrm_server_internal_models_system.SysUser"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/init/checkdb": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "数据库"
+                ],
+                "summary": "检查数据库",
+                "responses": {
+                    "200": {
+                        "description": "检查数据库是否初始化成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_unicrm_server_internal_models_common_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " msg": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/init/initdb": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "数据库"
+                ],
+                "summary": "初始化数据库",
+                "parameters": [
+                    {
+                        "description": "初始化数据库参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_unicrm_server_internal_models_system_request.InitDB"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "初始化用户数据库",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_unicrm_server_internal_models_common_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -98,14 +221,109 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_unicrm_server_internal_models_system.SysUser": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "description": "主键ID",
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "integer"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "description": "更新时间",
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_unicrm_server_internal_models_system_request.InitDB": {
+            "type": "object",
+            "required": [
+                "admin-password",
+                "db-name"
+            ],
+            "properties": {
+                "admin-password": {
+                    "type": "string"
+                },
+                "config": {
+                    "type": "string"
+                },
+                "db-name": {
+                    "description": "数据库名",
+                    "type": "string"
+                },
+                "db-type": {
+                    "description": "数据库类型",
+                    "type": "string"
+                },
+                "engine": {
+                    "description": "数据库引擎，默认InnoDB",
+                    "type": "string",
+                    "default": "InnoDB"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "log-mode": {
+                    "description": "是否开启Gorm全局日志",
+                    "type": "string"
+                },
+                "max-idle-conns": {
+                    "description": "空闲中的最大连接数",
+                    "type": "integer"
+                },
+                "max-open-conns": {
+                    "description": "打开到数据库的最大连接数",
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                },
+                "prefix": {
+                    "type": "string"
+                },
+                "singular": {
+                    "type": "boolean"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_unicrm_server_internal_models_system_request.Login": {
             "type": "object",
+            "required": [
+                "captcha",
+                "password",
+                "username"
+            ],
             "properties": {
                 "captcha": {
                     "description": "验证码",
                     "type": "string"
                 },
-                "captchaId": {
+                "captcha_id": {
                     "description": "验证码ID",
                     "type": "string"
                 },
@@ -116,6 +334,40 @@ const docTemplate = `{
                 "username": {
                     "description": "用户名",
                     "type": "string"
+                }
+            }
+        },
+        "github_com_unicrm_server_internal_models_system_request.Register": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "description": "邮箱",
+                    "type": "string",
+                    "example": "邮箱"
+                },
+                "enable": {
+                    "description": "是否启用",
+                    "type": "string",
+                    "example": "是否启用"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string",
+                    "example": "密码"
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string",
+                    "example": "手机号"
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string",
+                    "example": "用户名"
                 }
             }
         },
@@ -133,6 +385,14 @@ const docTemplate = `{
                 },
                 "picPath": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_unicrm_server_internal_models_system_response.SysUserResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/github_com_unicrm_server_internal_models_system.SysUser"
                 }
             }
         }

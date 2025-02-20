@@ -8,14 +8,29 @@ import (
 	"gorm.io/gorm"
 )
 
-func ClearTable(db *gorm.DB, tableName string) error {
-	if tableName == "" {
-		return errors.New("表名不能为空")
+func ClearTables(db *gorm.DB) error {
+	if db == nil {
+		return errors.New("数据库未初始化")
 	}
-	detail := &ClearDB{
-		TableName:    tableName,
+	var clearTablesDetail []ClearDB
+	// 清理jwt黑名单表，保留7天数据
+	clearTablesDetail = append(clearTablesDetail, ClearDB{
+		TableName:    "unicrm_jwt_black_list",
 		CompareField: "created_at",
-		Interval:     "10m",
+		Interval:     "168h",
+	})
+	for _, detail := range clearTablesDetail {
+		err := ClearTable(db, &detail)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func ClearTable(db *gorm.DB, detail *ClearDB) error {
+	if detail.TableName == "" {
+		return errors.New("表名不能为空")
 	}
 	if db == nil {
 		return errors.New("数据库未初始化")

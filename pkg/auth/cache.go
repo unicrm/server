@@ -30,13 +30,13 @@ func AddBlacklist(jwt string) error {
 }
 
 // 初始化jwt黑名单缓存
-func InitBlacklist(jwt JWT) error {
+func InitBlacklist(jwt JWT) (abc *cache.Cache, err error) {
 	dr, err := tools.ParseDuration(jwt.ExpiresTime)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	AUTH_BLACK_CACHE = cache.New(dr, 10*time.Minute)
-	return nil
+	return AUTH_BLACK_CACHE, nil
 }
 
 // 初始化jwt到黑名单

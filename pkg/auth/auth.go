@@ -12,10 +12,10 @@ import (
 )
 
 // 创建自定义声明
-func (auth *AuthExtend) CreateClaims(baseClaims internal.BaseClaims) internal.CustomClaims {
+func (auth *AuthExtend) CreateClaims(baseClaims BaseClaims) CustomClaims {
 	bf, _ := tools.ParseDuration(auth.BufferTime)
 	ep, _ := tools.ParseDuration(auth.ExpiresTime)
-	claims := internal.CustomClaims{
+	claims := CustomClaims{
 		BaseClaims: baseClaims,
 		BufferTime: int64(bf / time.Second), // 缓冲时间1天 缓冲时间内会获得新的token刷新令牌 此时一个用户会存在两个有效令牌 但是前端只留一个 另一个会丢失
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -29,20 +29,20 @@ func (auth *AuthExtend) CreateClaims(baseClaims internal.BaseClaims) internal.Cu
 }
 
 // 创建令牌
-func (auth *AuthExtend) CreateToken(claims internal.CustomClaims) (string, error) {
+func (auth *AuthExtend) CreateToken(claims CustomClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(AUTH.SigningKeyByte)
 }
 
 // 解析令牌
-func (auth *AuthExtend) ParseToken(tokenString string) (*internal.CustomClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &internal.CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+func (auth *AuthExtend) ParseToken(tokenString string) (*CustomClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return AUTH.SigningKeyByte, nil
 	}, jwt.WithLeeway(5*time.Second))
 	if err != nil {
 		zap.L().Error(internal.ErrTokenParsed.Error(), zap.Error(err))
 		return nil, err
-	} else if claims, ok := token.Claims.(*internal.CustomClaims); ok {
+	} else if claims, ok := token.Claims.(*CustomClaims); ok {
 		return claims, nil
 	} else {
 		zap.L().Error(internal.ErrClaimsInvalid.Error())
@@ -96,7 +96,7 @@ func (auth *AuthExtend) ClearToken(c *gin.Context) {
 }
 
 // 刷新令牌
-func (auth *AuthExtend) RefreshToken(claims *internal.CustomClaims, token string) (*internal.CustomClaims, string) {
+func (auth *AuthExtend) RefreshToken(claims *CustomClaims, token string) (*CustomClaims, string) {
 	if claims.ExpiresAt.Unix()-time.Now().Unix() < claims.BufferTime {
 		dr, _ := tools.ParseDuration(auth.ExpiresTime)
 		claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(dr))

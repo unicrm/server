@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
-	"github.com/unicrm/server/pkg/auth/internal"
 	"go.uber.org/zap"
 )
 
@@ -27,7 +26,7 @@ func TestMain(m *testing.M) {
 func TestCreateToken(t *testing.T) {
 	InitAuth(JWT{SigningKey: "ssssssssssss", Issuer: "unicrm"})
 	var err error
-	var claims internal.CustomClaims
+	var claims CustomClaims
 	token, claims, err = LoginToken(uuid.UUID{})
 	zap.L().Info("CreateToken", zap.Any("claims", claims))
 	assert.Nil(t, err)

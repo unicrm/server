@@ -29,6 +29,7 @@ system:
   use-redis: true
   router-prefix: "/api/v1"
   redis-name: default
+  use-multipoint: false
 
 general-db:
   db-type: mysql
